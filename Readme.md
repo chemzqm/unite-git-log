@@ -4,8 +4,8 @@
 
 [Unite.vim](https://github.com/Shougo/unite.vim)  [fugitive.vim](https://github.com/tpope/vim-fugitive)
 
-![animates](http://7jpox4.com1.z0.glb.clouddn.com/animates.gif)
 
+![git-log](http://7jpox4.com1.z0.glb.clouddn.com/animates.gif)
 
 ## 安装
 
