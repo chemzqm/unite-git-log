@@ -6,7 +6,6 @@ function! unite#sources#gitlog#define()
   return s:source
 endfunction
 
-
 let s:source = {
       \ 'name': 'gitlog',
       \ 'max_candidates': 100,
@@ -66,7 +65,7 @@ function! s:source.hooks.on_init(args, context) abort
     let extra = extra . ' --since="' . days . 'days ago"'
   endif
 
-  let a:context.source__winnr = winnr()
+  let a:context.source__bufname = bufname('%')
   let a:context.source__git_dir = gitdir
   let a:context.source__extra_opts = extra
 endfunction
@@ -188,7 +187,7 @@ function! s:source.async_gather_candidates(args, context) abort
           \ 'is_dummy' : is_dummy,
           \ 'source__git_dir' : a:context.source__git_dir,
           \ 'source__tmp_file': '',
-          \ 'source__winnr' : a:context.source__winnr,
+          \ 'source__bufname' : a:context.source__bufname,
           \ 'source__info' : info,
           \ "kind": ["file", "command"],
           \ })
@@ -204,12 +203,10 @@ function! s:getLineInfo(line)
 endfunction
 
 function! s:source.action_table.delete.func(candidate)
-  let wnr = winnr()
-  execute "pclose"
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
-  execute "normal! \<c-w>j"
-  exe "Gdiff " . a:candidate.source__info[0]
+  let gitdir = a:candidate.source__git_dir
+  call s:diffWith(ref, a:candidate.source__bufname, gitdir)
 endfunction
 
 function! s:source.action_table.preview.func(candidate)
@@ -218,8 +215,7 @@ function! s:source.action_table.preview.func(candidate)
   if !len(temp)
     let temp = fnamemodify(tempname(), ":h") . "/" . ref
     let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
-          \. ' --no-pager show --no-color --encoding=' . &encoding
-          \. ' ' . ref . ' > ' . temp
+          \. ' --no-pager show --no-color ' . ref . ' > ' . temp
     let a:candidate.source__tmp_file = temp
     execute cmd
   endif
@@ -229,8 +225,12 @@ function! s:source.action_table.preview.func(candidate)
 
   let winnr = winnr()
   execute 'wincmd P'
+  let bufname = a:candidate.source__bufname
+  let gitdir = a:candidate.source__git_dir
+  execute 'nnoremap <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '","'.gitdir.'")<cr>'
   setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax
   setlocal foldtext=fugitive#foldtext()
+  execute "normal! zM"
   execute winnr . 'wincmd w'
 endfunction
 
@@ -240,3 +240,54 @@ function! s:source.action_table.open.func(candidate)
   exe "Gedit " . a:candidate.source__info[0]
 endfunction
 
+function! s:diffWith(ref, bufname, gitdir) abort
+  execute 'pclose'
+  let bnr = bufwinnr(a:bufname)
+  execute bnr . 'wincmd w'
+
+  let ftype = &filetype
+  let prefix = system("git rev-parse --show-prefix")
+  let base = substitute(a:gitdir, '\.git$', '', '')
+  let gitfile = substitute(prefix,'\n$','','') . substitute(expand("%:p"), base, '', '')
+  let tmpfile = tempname()
+  let cmd = 'git --git-dir=' . a:gitdir
+        \. ' --no-pager show --no-color ' . a:ref . ':' .gitfile . ' > ' . tmpfile
+
+  let cmd_output = system(cmd)
+  if v:shell_error && cmd_output != ""
+    call unite#print_source_error(
+          \ cmd_output, s:source.name)
+    return
+  endif
+
+  " Begin diff
+  exe "vert diffsplit " . tmpfile
+  exe "set filetype=" . ftype
+  set foldmethod=diff
+  wincmd l
+
+  let wnr = bufwinnr(tmpfile)
+  execute wnr . 'wincmd w'
+  execute "normal! zM"
+  setlocal buftype=nowrite readonly nomodified
+  set foldmethod=diff
+  nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
+  call setbufvar(tmpfile, 'git_dir', a:gitdir)
+  let w:fugitive_diff_restore = s:diff_restore()
+
+endfunction
+
+function! s:diff_restore() abort
+  let restore = 'setlocal nodiff noscrollbind'
+        \ . ' scrollopt=' . &l:scrollopt
+        \ . (&l:wrap ? ' wrap' : ' nowrap')
+        \ . ' foldlevel=999'
+        \ . ' foldmethod=' . &l:foldmethod
+        \ . ' foldcolumn=' . &l:foldcolumn
+        \ . ' foldlevel=' . &l:foldlevel
+        \ . (&l:foldenable ? ' foldenable' : ' nofoldenable')
+  if has('cursorbind')
+    let restore .= (&l:cursorbind ? ' ' : ' no') . 'cursorbind'
+  endif
+  return restore
+endfunction
