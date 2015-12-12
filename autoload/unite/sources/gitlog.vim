@@ -203,21 +203,12 @@ function! s:getLineInfo(line)
   return [ref, user]
 endfunction
 
-function! s:source.action_table.open.func(candidate)
-  let ref = a:candidate.source__info[0]
-  if !len(ref) | return | endif
-  exe "Gedit " . a:candidate.source__info[0]
-endfunction
-
 function! s:source.action_table.delete.func(candidate)
   let wnr = winnr()
   execute "pclose"
-  call unite#redraw(wnr)
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
-  let nr = a:candidate.source__winnr
   execute "normal! \<c-w>j"
-  execute nr . "wincmd w"
   exe "Gdiff " . a:candidate.source__info[0]
 endfunction
 
@@ -241,3 +232,10 @@ function! s:source.action_table.preview.func(candidate)
   setlocal foldlevel=1
   execute winnr . 'wincmd w'
 endfunction
+
+function! s:source.action_table.open.func(candidate)
+  let ref = a:candidate.source__info[0]
+  if !len(ref) | return | endif
+  exe "Gedit " . a:candidate.source__info[0]
+endfunction
+
