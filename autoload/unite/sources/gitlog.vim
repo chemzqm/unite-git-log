@@ -225,11 +225,12 @@ function! s:source.action_table.preview.func(candidate)
   endif
 
   call unite#view#_preview_file(temp)
+  call unite#add_previewed_buffer_list(temp)
 
   let winnr = winnr()
   execute 'wincmd P'
   setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax
-  setlocal foldlevel=1
+  setlocal foldtext=fugitive#foldtext()
   execute winnr . 'wincmd w'
 endfunction
 
