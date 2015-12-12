@@ -268,9 +268,15 @@ function! s:diffWith(ref, bufname, gitdir) abort
   let wnr = bufwinnr(tmpfile)
   execute wnr . 'wincmd w'
   execute "normal! zM"
-  setlocal buftype=nowrite readonly nomodified
-  set foldmethod=diff
-  nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
+  setlocal buftype=nowrite readonly nomodified foldmethod=diff
+  if &bufhidden ==# ''
+    setlocal bufhidden=delete
+  endif
+  execute "silent! file " . a:ref . ':' . gitfile
+  if mapcheck("q", "n") == ""
+    nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
+  endif
+  " used by fugitive
   call setbufvar(tmpfile, 'git_dir', a:gitdir)
   let w:fugitive_diff_restore = s:diff_restore()
 endfunction
