@@ -39,10 +39,10 @@
 
       :Unite gitlog:all:5
 
-* 动态图片中的命令映射(需自行添加到 .vimrc)：
+* 命令映射举例(需自行添加到 .vimrc)：
 
 ```
-    nnoremap <space>l :<C-u>Unite -buffer-name=gitlog -auto-preview -winheight=20 -vertical-preview gitlog<cr>
+    nnoremap <space>l :<C-u>Unite -buffer-name=gitlog -vertical-preview -winheight=10 gitlog<cr>
 ```
 
 你也可以通过 `g:unite_source_gitlog_default_opts` 来调整默认的 git log 命令选项，默认值为：
