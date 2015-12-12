@@ -66,7 +66,7 @@ function! s:source.hooks.on_init(args, context) abort
     let extra = extra . ' --since="' . days . 'days ago"'
   endif
 
-  let a:context.source__buffer = bufnr('%')
+  let a:context.source__winnr = winnr()
   let a:context.source__git_dir = gitdir
   let a:context.source__extra_opts = extra
 endfunction
@@ -181,10 +181,15 @@ function! s:source.async_gather_candidates(args, context) abort
 
   let candidates = []
   for line in lines
+    let info = s:getLineInfo(line)
+    let is_dummy = len(info[0]) ? 0 : 1
     call add(candidates, {
           \ 'word' : line,
-          \ 'source__buffer' : a:context.source__buffer,
-          \ 'source__info' : s:getLineInfo(line),
+          \ 'is_dummy' : is_dummy,
+          \ 'source__git_dir' : a:context.source__git_dir,
+          \ 'source__tmp_file': '',
+          \ 'source__winnr' : a:context.source__winnr,
+          \ 'source__info' : info,
           \ "kind": ["file", "command"],
           \ })
   endfor
@@ -193,7 +198,7 @@ function! s:source.async_gather_candidates(args, context) abort
 endfunction
 
 function! s:getLineInfo(line)
-  let ref = matchstr(a:line, '\v((\*|\|)\s)@<=[0-9A-Za-z]{7}(\s-\s)@=')
+  let ref = matchstr(a:line, '\v((\*\||)\s)@<=[0-9A-Za-z]{7}(\s-\s)@=')
   let user = matchstr(a:line, '\v\<[^<]+\>$')
   return [ref, user]
 endfunction
@@ -205,18 +210,34 @@ function! s:source.action_table.open.func(candidate)
 endfunction
 
 function! s:source.action_table.delete.func(candidate)
+  let wnr = winnr()
+  execute "pclose"
+  call unite#redraw(wnr)
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
-  let buf = a:candidate.source__buffer
+  let nr = a:candidate.source__winnr
   execute "normal! \<c-w>j"
-  execute "buffer " . buf
+  execute nr . "wincmd w"
   exe "Gdiff " . a:candidate.source__info[0]
 endfunction
 
 function! s:source.action_table.preview.func(candidate)
   let ref = a:candidate.source__info[0]
-  if !len(ref) | return | endif
-  execute "normal! \<c-w>j"
-  exe "Gpedit " . a:candidate.source__info[0]
-  execute "normal! \<c-w>k"
+  let temp = a:candidate.source__tmp_file
+  if !len(temp)
+    let temp = fnamemodify(tempname(), ":h") . "/" . ref
+    let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
+          \. ' --no-pager show --no-color --encoding=' . &encoding
+          \. ' ' . ref . ' > ' . temp
+    let a:candidate.source__tmp_file = temp
+    execute cmd
+  endif
+
+  call unite#view#_preview_file(temp)
+
+  let winnr = winnr()
+  execute 'wincmd P'
+  setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax
+  setlocal foldlevel=1
+  execute winnr . 'wincmd w'
 endfunction
