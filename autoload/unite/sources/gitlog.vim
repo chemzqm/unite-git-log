@@ -68,7 +68,6 @@ function! s:source.hooks.on_init(args, context) abort
   let a:context.source__bufname = bufname('%')
   let a:context.source__git_dir = gitdir
   let a:context.source__extra_opts = extra
-  let t:diff_buff = ''
 endfunction
 
 function! s:source.hooks.on_syntax(args, context)
@@ -242,10 +241,6 @@ function! s:source.action_table.open.func(candidate)
 endfunction
 
 function! s:diffWith(ref, bufname, gitdir) abort
-  let diffbuff = gettabvar(tabpagenr(), 'diff_buff')
-  if len(diffbuff) && bufexists(diffbuff)
-    execute "bdelete ". diffbuff
-  end
   let bnr = bufwinnr(a:bufname)
   execute bnr . 'wincmd w'
 
@@ -277,7 +272,6 @@ function! s:diffWith(ref, bufname, gitdir) abort
   set foldmethod=diff
   nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
   call setbufvar(tmpfile, 'git_dir', a:gitdir)
-  let t:diff_buff = tmpfile
   let w:fugitive_diff_restore = s:diff_restore()
 endfunction
 
