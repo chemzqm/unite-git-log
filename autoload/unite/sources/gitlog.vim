@@ -52,17 +52,17 @@ function! s:source.hooks.on_init(args, context) abort
 
   let extra = ''
 
+  let days = get(a:args, 1, '')
+  if len(days)
+    let extra = extra . ' --since="' . days . 'days ago"'
+  endif
+
   " first argument
   if get(a:args, 0, '') !=? 'all'
     let file = fnamemodify(expand('%:p'),
     \  ':s?'. fnamemodify(gitdir, ':h') . '/??')
     if s:is_windows | let file = substitute(file, '^\\', '', '') | endif
     let extra = extra . ' -- ' . file
-  endif
-
-  let days = get(a:args, 1, '')
-  if len(days)
-    let extra = extra . ' --since="' . days . 'days ago"'
   endif
 
   let a:context.source__bufname = bufname('%')
