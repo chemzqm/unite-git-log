@@ -266,7 +266,7 @@ function! s:diffWith(ref, bufname, gitdir) abort
   endif
 
   " Begin diff
-  exe "vert diffsplit " . tmpfile
+  exe "silent! vert diffsplit " . tmpfile
   exe "set filetype=" . ftype
   set foldmethod=diff
   wincmd l
