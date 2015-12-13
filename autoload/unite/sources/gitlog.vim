@@ -245,10 +245,16 @@ function! s:diffWith(ref, bufname, gitdir) abort
   execute bnr . 'wincmd w'
 
   let ftype = &filetype
-  let prefix = system("git rev-parse --show-prefix")
+  let prefix = system("git --git-dir=" . a:gitdir . " rev-parse --show-prefix")
+  if v:shell_error && cmd_output != ""
+    call unite#print_source_error(
+          \ cmd_output, s:source.name)
+    return
+  endif
   let base = substitute(a:gitdir, '\.git$', '', '')
   let gitfile = substitute(prefix,'\n$','','') . substitute(expand("%:p"), base, '', '')
   let tmpfile = tempname()
+
   let cmd = 'git --git-dir=' . a:gitdir
         \. ' --no-pager show --no-color ' . a:ref . ':' .gitfile . ' > ' . tmpfile
 
