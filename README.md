@@ -6,6 +6,8 @@
 
 ![git-log](http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif)
 
+http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
+
 ## 安装
 
 推荐使用你熟悉的 vim 包工具进行安装，例如：[Vundle](https://github.com/gmarik/vundle)
