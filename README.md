@@ -4,9 +4,7 @@
 
 [Unite.vim](https://github.com/Shougo/unite.vim)  [fugitive.vim](https://github.com/tpope/vim-fugitive)
 
-![git-log](http://7jpox4.com1.z0.glb.clouddn.com/animates.gif)
-
-图片加载慢请访问链接：http://7jpox4.com1.z0.glb.clouddn.com/animates.gif
+![git-log](http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif)
 
 ## 安装
 
