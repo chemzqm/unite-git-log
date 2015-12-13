@@ -227,7 +227,7 @@ function! s:source.action_table.preview.func(candidate)
   execute 'wincmd P'
   let bufname = a:candidate.source__bufname
   let gitdir = a:candidate.source__git_dir
-  execute 'nnoremap <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '","'.gitdir.'")<cr>'
+  execute 'nnoremap <silent> <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '","'.gitdir.'")<cr>'
   setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax
   setlocal foldtext=fugitive#foldtext()
   execute "normal! zM"
