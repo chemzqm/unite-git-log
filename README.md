@@ -57,7 +57,7 @@ http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
 * `p`    预览窗口查看记录
 * `d`    与当前文件执行 diff 操作
 * `<cr>` 主窗口查看记录，可使用 fugitive 快捷键（例如 `gf` 进行跳转）
-* `q`    退出
+* `q`    退出当前窗口
 
 
 ## MIT license
