@@ -70,7 +70,7 @@ function! s:source.hooks.on_init(args, context) abort
   let a:context.source__extra_opts = extra
 endfunction
 
-function! s:source.hooks.on_syntax(args, context)
+function! s:source.hooks.on_syntax(args, context) abort
   if !unite#util#has_vimproc()
     return
   endif
@@ -98,13 +98,13 @@ function! s:source.hooks.on_syntax(args, context)
 endfunction
 
 
-function! s:source.hooks.on_close(args, context)
+function! s:source.hooks.on_close(args, context) abort
   if has_key(a:context, 'source__proc')
     call a:context.source__proc.kill()
   endif
 endfunction
 
-function! s:source.gather_candidates(args, context)
+function! s:source.gather_candidates(args, context) abort
   let command = 'git --git-dir=' . a:context.source__git_dir
         \. ' --no-pager log'
 
@@ -196,20 +196,20 @@ function! s:source.async_gather_candidates(args, context) abort
   return candidates
 endfunction
 
-function! s:getLineInfo(line)
+function! s:getLineInfo(line) abort
   let ref = matchstr(a:line, '\v((\*\||)\s)@<=[0-9A-Za-z]{7}(\s-\s)@=')
   let user = matchstr(a:line, '\v\<[^<]+\>$')
   return [ref, user]
 endfunction
 
-function! s:source.action_table.delete.func(candidate)
+function! s:source.action_table.delete.func(candidate) abort
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
   let gitdir = a:candidate.source__git_dir
   call s:diffWith(ref, a:candidate.source__bufname, gitdir)
 endfunction
 
-function! s:source.action_table.preview.func(candidate)
+function! s:source.action_table.preview.func(candidate) abort
   let ref = a:candidate.source__info[0]
   let temp = a:candidate.source__tmp_file
   if !len(temp)
@@ -234,7 +234,7 @@ function! s:source.action_table.preview.func(candidate)
   execute winnr . 'wincmd w'
 endfunction
 
-function! s:source.action_table.open.func(candidate)
+function! s:source.action_table.open.func(candidate) abort
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
   exe "Gedit " . a:candidate.source__info[0]
