@@ -39,10 +39,15 @@ http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
 
       :Unite gitlog:all:5
 
-* 命令映射举例(需自行添加到 .vimrc)：
+* 映射参考：(需自行添加到 .vimrc)：
 
 ```
-    nnoremap <space>l :<C-u>Unite -buffer-name=gitlog -vertical-preview -winheight=10 gitlog<cr>
+call unite#custom#profile('gitlog', 'context', {
+  \  'start_insert': 0,
+  \  'no_quit': 1,
+  \  'vertical_preview': 1,
+  \ })
+nnoremap <silent> <space></space>l  :<C-u>Unite -buffer-name=gitlog   gitlog<cr>
 ```
 
 你也可以通过 `g:unite_source_gitlog_default_opts` 来调整默认的 git log 命令选项，默认值为：
