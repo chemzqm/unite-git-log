@@ -162,7 +162,7 @@ function! s:source.async_gather_candidates(args, context) abort
   if !stderr.eof
     " Print error.
     let errors = filter(unite#util#read_lines(stderr, 200),
-          \ "v:val !~ '^\\s*$'")
+          \ "v:val !~? '^\\s*$'")
     if !empty(errors)
       call unite#print_source_error(errors, s:source.name)
     endif
@@ -245,21 +245,21 @@ function! s:diffWith(ref, bufname, gitdir) abort
   execute bnr . 'wincmd w'
 
   let ftype = &filetype
-  let prefix = system("git --git-dir=" . a:gitdir . " rev-parse --show-prefix")
-  if v:shell_error && cmd_output != ""
+  let base = simplify(a:gitdir . '/../')
+  if v:shell_error && cmd_output !=# ""
     call unite#print_source_error(
           \ cmd_output, s:source.name)
     return
   endif
-  let base = substitute(a:gitdir, '\.git$', '', '')
-  let gitfile = substitute(prefix,'\n$','','') . substitute(expand("%:p"), base, '', '')
+
+  let gitfile = substitute(expand("%:p"), base, '', '')
   let tmpfile = tempname()
 
   let cmd = 'git --git-dir=' . a:gitdir
         \. ' --no-pager show --no-color ' . a:ref . ':' .gitfile . ' > ' . tmpfile
 
   let cmd_output = system(cmd)
-  if v:shell_error && cmd_output != ""
+  if v:shell_error && cmd_output !=# ""
     call unite#print_source_error(
           \ cmd_output, s:source.name)
     return
@@ -279,7 +279,7 @@ function! s:diffWith(ref, bufname, gitdir) abort
     setlocal bufhidden=delete
   endif
   execute "silent! file " . a:ref . ':' . gitfile
-  if mapcheck("q", "n") == ""
+  if mapcheck("q", "n") ==# ""
     nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
   endif
   " used by fugitive
