@@ -215,7 +215,7 @@ function! s:source.action_table.preview.func(candidate) abort
   if !len(temp)
     let temp = fnamemodify(tempname(), ":h") . "/" . ref
     let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
-          \. ' --no-pager show --no-color ' . ref . ' > ' . temp
+          \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2 > &1'
     let a:candidate.source__tmp_file = temp
     execute cmd
   endif
@@ -230,14 +230,32 @@ function! s:source.action_table.preview.func(candidate) abort
   execute 'nnoremap <silent> <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '","'.gitdir.'")<cr>'
   setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax
   setlocal foldtext=fugitive#foldtext()
-  execute "normal! zM"
   execute winnr . 'wincmd w'
 endfunction
 
 function! s:source.action_table.open.func(candidate) abort
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
-  exe "Gedit " . a:candidate.source__info[0]
+  let gitdir = fugitive#extract_git_dir(expand('%:p'))
+  let base = fnamemodify(gitdir, ':h')
+  let cwd = getcwd()
+  execute 'silent cd ' . base
+  let tmp_file = tempname()
+  let cmd = 'git --no-pager show ' . ref . ' > ' . tmp_file . ' 2>&1'
+  let cmd_output = system(cmd)
+  if v:shell_error && cmd_output !=# ''
+    echohl WarningMsg | echon cmd_output
+    return
+  endif
+  execute 'silent edit ' . tmp_file
+  if mapcheck('q', 'n') ==# ''
+    nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
+  endif
+  execute 'file git://' . base . '/' .  ref
+  setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax foldlevel=0
+  setlocal foldtext=fugitive#foldtext()
+  setlocal bufhidden=delete
+  execute 'silent cd ' . cwd
 endfunction
 
 function! s:diffWith(ref, bufname, gitdir) abort
@@ -257,7 +275,7 @@ function! s:diffWith(ref, bufname, gitdir) abort
 
   let cmd = 'git --git-dir=' . a:gitdir
         \. ' --no-pager show --no-color ' . a:ref . ':' .gitfile . ' > ' . tmpfile
-
+        \. ' 2>&1'
   let cmd_output = system(cmd)
   if v:shell_error && cmd_output !=# ""
     call unite#print_source_error(
@@ -273,8 +291,7 @@ function! s:diffWith(ref, bufname, gitdir) abort
 
   let wnr = bufwinnr(tmpfile)
   execute wnr . 'wincmd w'
-  execute "normal! zM"
-  setlocal buftype=nowrite readonly nomodified foldmethod=diff
+  setlocal buftype=nowrite readonly nomodified foldmethod=diff foldlevel=0
   if &bufhidden ==# ''
     setlocal bufhidden=delete
   endif
