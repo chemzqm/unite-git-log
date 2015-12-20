@@ -215,7 +215,7 @@ function! s:source.action_table.preview.func(candidate) abort
   if !len(temp)
     let temp = fnamemodify(tempname(), ":h") . "/" . ref
     let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
-          \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2 > &1'
+          \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2>&1'
     let a:candidate.source__tmp_file = temp
     execute cmd
   endif
