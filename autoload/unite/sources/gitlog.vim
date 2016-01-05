@@ -40,22 +40,17 @@ function! s:source.hooks.on_init(args, context) abort
     return
   endif
 
-  if !exists('*fugitive#extract_git_dir')
-    call unite#print_source_error('Could not detect fugitive.'
-      \ . 'You should probably not working under a git repositry.'
-      \ . 'Or not have fugitive installed', s:source.name)
+  if !exists('*easygit#gitdir')
+    call unite#print_source_error('Could not detect easygit.'
+      \ . 'You need to install it first', s:source.name)
     return
   endif
 
-  let gitdir = fugitive#extract_git_dir(expand('%:p'))
+  let gitdir = easygit#gitdir('%')
   let a:context.source__directory = gitdir
 
-  let extra = ''
-
-  let days = get(a:args, 1, '')
-  if len(days)
-    let extra = extra . ' --since="' . days . 'days ago"'
-  endif
+  let extra = empty(get(a:args, 1, '')) ? '' :
+    \ ' --since="' . a:args[1] . 'days ago"'
 
   " first argument
   if get(a:args, 0, '') !=? 'all'
@@ -128,16 +123,10 @@ function! s:source.gather_candidates(args, context) abort
     \   a:context.source__extra_opts,
     \)
 
-
-  "call unite#print_source_error(cmdline, self.name)
-
-  call unite#add_source_message('Command-line: ' . cmdline, s:source.name)
-
   let save_term = $TERM
   try
     " Disable colors.
     let $TERM = 'dumb'
-
     let a:context.source__proc = vimproc#plineopen3(
           \ vimproc#util#iconv(cmdline, &encoding,
           \ g:unite_source_gitlog_encoding),
@@ -206,7 +195,7 @@ function! s:source.action_table.delete.func(candidate) abort
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
   let gitdir = a:candidate.source__git_dir
-  call s:diffWith(ref, a:candidate.source__bufname, gitdir)
+  call s:diffWith(ref, a:candidate.source__bufname)
 endfunction
 
 function! s:source.action_table.preview.func(candidate) abort
@@ -228,93 +217,26 @@ function! s:source.action_table.preview.func(candidate) abort
   let bufname = a:candidate.source__bufname
   let gitdir = a:candidate.source__git_dir
   execute 'nnoremap <silent> <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '","'.gitdir.'")<cr>'
-  setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax
-  setlocal foldtext=fugitive#foldtext()
+  setlocal filetype=git buftype=nofile readonly foldmethod=syntax
+  setlocal foldtext=easygit#foldtext()
   execute winnr . 'wincmd w'
 endfunction
 
 function! s:source.action_table.open.func(candidate) abort
   let ref = a:candidate.source__info[0]
   if !len(ref) | return | endif
-  let gitdir = fugitive#extract_git_dir(expand('%:p'))
-  let base = fnamemodify(gitdir, ':h')
-  let cwd = getcwd()
-  execute 'silent cd ' . base
-  let tmp_file = tempname()
-  let cmd = 'git --no-pager show ' . ref . ' > ' . tmp_file . ' 2>&1'
-  let cmd_output = system(cmd)
-  if v:shell_error && cmd_output !=# ''
-    echohl WarningMsg | echon cmd_output
-    return
-  endif
-  execute 'silent edit ' . tmp_file
-  if mapcheck('q', 'n') ==# ''
-    nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
-  endif
-  execute 'file git://' . base . '/' .  ref
-  setlocal filetype=git buftype=nowrite readonly nomodified foldmethod=syntax foldlevel=0
-  setlocal foldtext=fugitive#foldtext()
-  setlocal bufhidden=delete
-  execute 'silent cd ' . cwd
+  let bufname = a:candidate.source__bufname
+  let gitdir = easygit#gitdir(bufname)
+  call easygit#show(ref, {
+      \ "all": 1,
+      \ "gitdir": gitdir,
+      \})
+  let g:pnr = b:easygit_prebufnr
+  " TODO remap u and d for current list
 endfunction
 
-function! s:diffWith(ref, bufname, gitdir) abort
-  let bnr = bufwinnr(a:bufname)
-  execute bnr . 'wincmd w'
-
-  let ftype = &filetype
-  let base = simplify(a:gitdir . '/../')
-  if v:shell_error && cmd_output !=# ""
-    call unite#print_source_error(
-          \ cmd_output, s:source.name)
-    return
-  endif
-
-  let gitfile = substitute(expand("%:p"), base, '', '')
-  let tmpfile = tempname()
-
-  let cmd = 'git --git-dir=' . a:gitdir
-        \. ' --no-pager show --no-color ' . a:ref . ':' .gitfile . ' > ' . tmpfile
-        \. ' 2>&1'
-  let cmd_output = system(cmd)
-  if v:shell_error && cmd_output !=# ""
-    call unite#print_source_error(
-          \ cmd_output, s:source.name)
-    return
-  endif
-
-  " Begin diff
-  exe "silent! vert diffsplit " . tmpfile
-  exe "set filetype=" . ftype
-  set foldmethod=diff
-  wincmd l
-
-  let wnr = bufwinnr(tmpfile)
+function! s:diffWith(ref, bufname) abort
+  let wnr = bufwinnr(a:bufname)
   execute wnr . 'wincmd w'
-  setlocal buftype=nowrite readonly nomodified foldmethod=diff foldlevel=0
-  if &bufhidden ==# ''
-    setlocal bufhidden=delete
-  endif
-  execute "silent! file " . a:ref . ':' . gitfile
-  if mapcheck("q", "n") ==# ""
-    nnoremap <buffer> <silent> q  :<C-U>bdelete<CR>
-  endif
-  " used by fugitive
-  call setbufvar(tmpfile, 'git_dir', a:gitdir)
-  let w:fugitive_diff_restore = s:diff_restore()
-endfunction
-
-function! s:diff_restore() abort
-  let restore = 'setlocal nodiff noscrollbind'
-        \ . ' scrollopt=' . &l:scrollopt
-        \ . (&l:wrap ? ' wrap' : ' nowrap')
-        \ . ' foldlevel=999'
-        \ . ' foldmethod=' . &l:foldmethod
-        \ . ' foldcolumn=' . &l:foldcolumn
-        \ . ' foldlevel=' . &l:foldlevel
-        \ . (&l:foldenable ? ' foldenable' : ' nofoldenable')
-  if has('cursorbind')
-    let restore .= (&l:cursorbind ? ' ' : ' no') . 'cursorbind'
-  endif
-  return restore
+  call easygit#diffThis(a:ref)
 endfunction
