@@ -1,12 +1,18 @@
 # Unite-git-log
 
-这是一个让你做为 vimer 可以感到自豪的插件，并不是说它本身多么优秀，而是它整合了或许是当今最好用的 vim 插件：
+使用 unite 界面与 gitlog 进行交互
 
-[Unite.vim](https://github.com/Shougo/unite.vim)  [fugitive.vim](https://github.com/tpope/vim-fugitive)
+[Unite.vim](https://github.com/Shougo/unite.vim)
 
 ![git-log](http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif)
 
 http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
+
+## 更新
+
+2016-01-08
+
+* 添加了 reset 操作
 
 ## 安装
 
@@ -17,7 +23,7 @@ http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
     Plugin 'Shougo/unite.vim'
     " vimproc 必须要，可能还需要执行 make， 请阅读官方说明: https://github.com/Shougo/vimproc.vim
     Plugin 'Shougo/vimproc'
-    Plugin 'tpope/vim-fugitive'
+    Plugin 'chemzqm/easygit'
     Plugin 'chemzqm/unite-git-log'
 
 然后安装：
@@ -66,10 +72,3 @@ nnoremap <silent> <space></space>l  :<C-u>Unite -buffer-name=gitlog   gitlog<cr>
 
 
 ## MIT license
-    Copyright (c) 2015 chemzqm@gmail.com
-    
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-    
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-    
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -8,7 +8,7 @@ endfunction
 
 let s:source = {
       \ 'name': 'gitlog',
-      \ 'max_candidates': 100,
+      \ 'max_candidates': 500,
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__Gitlog',
       \  "default_action" : "open",
@@ -26,7 +26,12 @@ let s:source = {
       \      'description': 'preview git log',
       \      'is_quit': 0,
       \      'is_selectable': 0,
-      \    }
+      \    },
+      \    'reset': {
+      \      'description': 'reset --hard',
+      \      'is_quit': 0,
+      \      'is_selectable': 0,
+      \    },
       \  }
       \ }
 
@@ -40,13 +45,13 @@ function! s:source.hooks.on_init(args, context) abort
     return
   endif
 
-  if !exists('*easygit#gitdir')
+  if !exists('g:did_easygit_loaded')
     call unite#print_source_error('Could not detect easygit.'
       \ . 'You need to install it first', s:source.name)
     return
   endif
 
-  let gitdir = easygit#gitdir('%')
+  let gitdir = easygit#gitdir(expand('%'))
   let a:context.source__directory = gitdir
 
   let extra = empty(get(a:args, 1, '')) ? '' :
@@ -91,7 +96,6 @@ function! s:source.hooks.on_syntax(args, context) abort
   highlight default link uniteSource__GitlogUser Constant
 
 endfunction
-
 
 function! s:source.hooks.on_close(args, context) abort
   if has_key(a:context, 'source__proc')
@@ -231,8 +235,31 @@ function! s:source.action_table.open.func(candidate) abort
       \ "all": 1,
       \ "gitdir": gitdir,
       \})
-  let g:pnr = b:easygit_prebufnr
   " TODO remap u and d for current list
+endfunction
+
+function! s:source.action_table.reset.func(candidate) abort
+  let ref = a:candidate.source__info[0]
+  let wnr = winnr()
+  if empty(ref) | return | endif
+  let bufname = a:candidate.source__bufname
+  let wnr = bufwinnr(bufname)
+  if wnr < 0 | return | endif
+  execute wnr . 'wincmd w'
+  let root = easygit#smartRoot()
+  if empty(root) | return | endif
+  let cwd = getcwd()
+  exe 'lcd ' . root
+  let output = system('git reset --hard ' . ref)
+  if v:shell_error && output !=# ""
+    echohl Error | echon output | echohl None
+    exe 'lcd ' . cwd
+    return
+  endif
+  exe 'lcd ' . cwd
+  execute 'wincmd p'
+  let unite = unite#get_current_unite()
+  call unite#force_redraw()
 endfunction
 
 function! s:diffWith(ref, bufname) abort
