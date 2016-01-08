@@ -8,13 +8,15 @@
 
 http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
 
+**注意** 新版使用[easygit](https://github.com/chemzqm/easygit),
+如不想安装新插件，可使用调用 fugitive 插件的 tag 0.1.0
+
 ## 更新
 
-2016-01-06
-* 新版去除了 `fugitive` 依赖，使用 [easygit](https://github.com/chemzqm/easygit)
-
 2016-01-08
+* 新版去除了 `fugitive` 依赖，使用更为友好的 [easygit](https://github.com/chemzqm/easygit)
 
+2016-01-06
 * 添加了 reset 操作
 * 添加了默认 edit 操作内 quit 和 diff 的快捷键 `q` 和 `d`
 
