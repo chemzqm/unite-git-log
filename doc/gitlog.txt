@@ -1,0 +1,140 @@
+*unite-git-log.txt*	A unite source for git-log
+
+                   _ _                   _ _   _               ~
+                  (_) |                 (_) | | |              ~
+       _   _ _ __  _| |_ ___ ______ __ _ _| |_| | ___   __ _   ~
+      | | | | '_ \| | __/ _ \______/ _` | | __| |/ _ \ / _` |  ~
+      | |_| | | | | | ||  __/     | (_| | | |_| | (_) | (_| |  ~
+       \__,_|_| |_|_|\__\___|      \__, |_|\__|_|\___/ \__, |  ~
+                                    __/ |               __/ |  ~
+                                   |___/               |___/   ~
+
+
+Author  : Qiming Zhao <chemzqm@gmail.com>
+Version : 0.2.0
+License : MIT license {{{
+
+  Copyright (c) 2016 chemzqm@gmail.com
+
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+}}}
+
+==============================================================================
+CONTENTS				*unite-gitlog-contents*
+
+INTRODUCTION		|unite-gitlog-introduction|
+PREREQUIREMENT		|unite-gitlog-prerequirement|
+INSTALLATION		|unite-gitlog-installation|
+INTERFACE		|unite-gitlog-interface|
+  COMMANDS			|unite-gitlog-commands|
+  ACTIONS			|unite-gitlog-actions|
+  KEYMAPPING			|unite-gitlog-keymapping|
+CHANGELOG		|unite-gitlog-changelog|
+
+==============================================================================
+INTRODUCTION				*unite-gitlog-introduction*
+
+unite-gitlog let you works with gitlog combined with the power of unite.
+Start unite-gitlog with command like: >
+
+	:Unite gitlog
+
+Note: command need shell to work, may not works on windows, never tested
+
+==============================================================================
+PREREQUIREMENT				*unite-gitlog-prerequirement*
+
+This plugin requires |unite|, |vimproc| and |easygit| to work.  If you're
+using vundle, you can install them by add:
+>
+	Plugin 'Shougo/unite.vim'
+	Plugin 'Shougo/vimproc'
+	Plugin 'chemzqm/easygit'
+
+to your `.vimrc`
+
+==============================================================================
+INSTALLATION				*unite-gitlog-installation*
+
+Install with your favorite plugin managers like NeoBundle/Plugin/Plug
+>
+	NeoBundle 'chemzqm/unite-git-log'
+	Plugin 'chemzqm/unite-git-log'
+	Plug 'chemzqm/unite-git-log'
+
+==============================================================================
+INTERFACE				*unite-gitlog-interface*
+
+------------------------------------------------------------------------------
+COMMANDS 				*unite-gitlog-commands*
+
+:Unite gitlog[:[{all}]:[{days}]]
+
+		By default, |unite-gitlog| would show all commit history for
+		current buffer, if you want all commits, use {all} argument,
+		if you want limit the log in number of days, use {days}
+		argument, eg: >
+
+		Unite gitlog:all:5
+<
+		would show all git log in 5 days.
+
+
+------------------------------------------------------------------------------
+ACTIONS 				*unite-gitlog-actions*
+
+open					*unite-gitlog-open*
+	default action, which open a buffer contains the commmit from git
+	show.
+
+delete					*unite-gitlog-delete*
+	Diff action, just named to delete so you can press <d> to start the
+	diff with current file.
+
+preview					*unite-gitlog-preview*
+	Show commit info in preview window.
+
+reset					*unite-gitlog-reset*
+	Run git reset --hard with current candidate.  Use it with caution.
+
+------------------------------------------------------------------------------
+KEYMAPPING 				*unite-gitlog-keymapping*
+
+d					*unite-gitlog-d*
+	Start diff with current working buffer, availalbe in preview buffer
+	and default commit show buffer
+
+q					*unite-gitlog-q*
+	In default commit show buffer, press <q> to quickly switch back to
+	your working buffer
+
+
+==============================================================================
+CHANGELOG				 *unite-gitlog-changelog*
+
+0.1.0 - 2015-12-20
+	works with |fugitive|
+
+0.2.0 - 2016-01-08
+	works with |easygit|
+
+==============================================================================
+
+vim:tw=78:ts=8:sts=8:ft=help:noet:fen:fdm=marker:

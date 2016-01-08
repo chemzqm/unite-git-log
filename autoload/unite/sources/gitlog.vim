@@ -47,7 +47,8 @@ function! s:source.hooks.on_init(args, context) abort
 
   if !exists('g:did_easygit_loaded')
     call unite#print_source_error('Could not detect easygit.'
-      \ . 'You need to install it first', s:source.name)
+      \ . 'You need to install it from '
+      \ . 'https://github.com/chemzqm/vim-easygit first', s:source.name)
     return
   endif
 
