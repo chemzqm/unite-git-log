@@ -244,7 +244,9 @@ function! s:source.action_table.open.func(candidate) abort
     exe wnr . 'wincmd w'
     execute 'edit ' . temp
   else
+    let view = winsaveview()
     execute 'keepalt edit ' . temp
+    call winrestview(view)
   endif
 
   execute 'nnoremap <silent> <buffer> d :<c-u>call'
