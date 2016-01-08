@@ -37,7 +37,6 @@ let s:source = {
 
 let s:is_windows = has('win16') || has('win32') || has('win64') || has('win95')
 
-
 function! s:source.hooks.on_init(args, context) abort
   if !unite#util#has_vimproc()
     call unite#print_source_error(
