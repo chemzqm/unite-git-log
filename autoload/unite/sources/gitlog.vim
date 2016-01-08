@@ -205,7 +205,7 @@ endfunction
 function! s:source.action_table.preview.func(candidate) abort
   let ref = a:candidate.source__info[0]
   let temp = a:candidate.source__tmp_file
-  if !len(temp)
+  if !empty(temp)
     let temp = fnamemodify(tempname(), ":h") . "/" . ref
     let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
           \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2>&1'
@@ -220,22 +220,39 @@ function! s:source.action_table.preview.func(candidate) abort
   execute 'wincmd P'
   let bufname = a:candidate.source__bufname
   let gitdir = a:candidate.source__git_dir
-  execute 'nnoremap <silent> <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '","'.gitdir.'")<cr>'
+  execute 'nnoremap <silent> <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '")<cr>'
   setlocal filetype=git buftype=nofile readonly foldmethod=syntax
   setlocal foldtext=easygit#foldtext()
   execute winnr . 'wincmd w'
 endfunction
 
+" Rewrite show d to show diff, q to quite
 function! s:source.action_table.open.func(candidate) abort
   let ref = a:candidate.source__info[0]
-  if !len(ref) | return | endif
+  let temp = a:candidate.source__tmp_file
   let bufname = a:candidate.source__bufname
-  let gitdir = easygit#gitdir(bufname)
-  call easygit#show(ref, {
-      \ "all": 1,
-      \ "gitdir": gitdir,
-      \})
-  " TODO remap u and d for current list
+  let gitdir = a:candidate.source__git_dir
+  let wnr = bufwinnr(bufname)
+  if empty(temp)
+    let temp = fnamemodify(tempname(), ":h") . "/" . ref
+    let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
+          \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2>&1'
+    let a:candidate.source__tmp_file = temp
+    execute cmd
+  endif
+  if wnr > 0
+    exe wnr . 'wincmd w'
+    execute 'edit ' . temp
+  else
+    execute 'keepalt edit ' . temp
+  endif
+
+  execute 'nnoremap <silent> <buffer> d :<c-u>call'
+        \.' <SID>diffWith("'.ref.'", "'.bufname. '")<cr>'
+  execute 'nnoremap <silent> <buffer> q :<c-u>call '
+        \.'<SID>smartQuite("'.bufname. '")<cr>'
+  setlocal filetype=git buftype=nofile readonly foldmethod=syntax
+  setlocal foldtext=easygit#foldtext()
 endfunction
 
 function! s:source.action_table.reset.func(candidate) abort
@@ -264,6 +281,16 @@ endfunction
 
 function! s:diffWith(ref, bufname) abort
   let wnr = bufwinnr(a:bufname)
-  execute wnr . 'wincmd w'
+  if wnr > 0
+    execute wnr . 'wincmd w'
+  else
+    let nr = bufnr(a:bufname)
+    exe 'keepalt b ' . nr
+  endif
   call easygit#diffThis(a:ref)
+endfunction
+
+function! s:smartQuite(bufname)
+  let nr = bufnr(a:bufname)
+  exe 'keepalt b ' . nr
 endfunction

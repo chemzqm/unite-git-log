@@ -10,9 +10,13 @@ http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
 
 ## 更新
 
+2016-01-06
+* 新版去除了 `fugitive` 依赖，使用 [easygit](https://github.com/chemzqm/easygit)
+
 2016-01-08
 
 * 添加了 reset 操作
+* 添加了默认 edit 操作内 quit 和 diff 的快捷键 `q` 和 `d`
 
 ## 安装
 
