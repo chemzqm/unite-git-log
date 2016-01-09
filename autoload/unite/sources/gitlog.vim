@@ -28,7 +28,7 @@ let s:source = {
       \      'is_selectable': 0,
       \    },
       \    'reset': {
-      \      'description': 'reset --hard',
+      \      'description': 'git reset commit',
       \      'is_quit': 0,
       \      'is_selectable': 0,
       \    },
@@ -269,7 +269,12 @@ function! s:source.action_table.reset.func(candidate) abort
   if empty(root) | return | endif
   let cwd = getcwd()
   exe 'lcd ' . root
-  let output = system('git reset --hard ' . ref)
+  if input('hard reset [y/n]?') =~? 'y'
+    let opt = '--hard '
+  else
+    let opt = ''
+  endif
+  let output = system('git reset ' . opt . ref)
   if v:shell_error && output !=# ""
     echohl Error | echon output | echohl None
     exe 'lcd ' . cwd
