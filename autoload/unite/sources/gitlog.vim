@@ -280,6 +280,7 @@ function! s:source.action_table.reset.func(candidate) abort
     exe 'lcd ' . cwd
     return
   endif
+  exe 'silent edit'
   exe 'lcd ' . cwd
   execute 'wincmd p'
   let unite = unite#get_current_unite()
