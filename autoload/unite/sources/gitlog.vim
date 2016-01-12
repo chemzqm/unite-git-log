@@ -51,7 +51,7 @@ function! s:source.hooks.on_init(args, context) abort
     return
   endif
 
-  let gitdir = easygit#gitdir(expand('%'))
+  let gitdir = easygit#gitdir(expand('%'), 1)
   let a:context.source__directory = gitdir
 
   let extra = empty(get(a:args, 1, '')) ? '' :
@@ -204,18 +204,14 @@ endfunction
 
 function! s:source.action_table.preview.func(candidate) abort
   let ref = a:candidate.source__info[0]
-  let temp = a:candidate.source__tmp_file
-  if !empty(temp)
-    let temp = fnamemodify(tempname(), ":h") . "/" . ref
-    let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
-          \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2>&1'
-    let a:candidate.source__tmp_file = temp
-    execute cmd
-  endif
-
+  let temp = fnamemodify(tempname(), ":h") . "/" . ref
+  let g:temp = temp
+  let g:dir = a:candidate.source__git_dir
+  let cmd = ':silent !git --git-dir=' . a:candidate.source__git_dir
+        \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2>&1'
+  execute cmd
   call unite#view#_preview_file(temp)
   call unite#add_previewed_buffer_list(temp)
-
   let winnr = winnr()
   execute 'wincmd P'
   let bufname = a:candidate.source__bufname
