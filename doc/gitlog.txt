@@ -112,7 +112,8 @@ preview					*unite-gitlog-preview*
 	Show commit info in preview window.
 
 reset					*unite-gitlog-reset*
-	Run git reset --hard with current candidate.  Use it with caution.
+	Run git reset [--hard] (default reset is Mixed mode) with current
+	candidate.  Use it with caution.
 
 ------------------------------------------------------------------------------
 KEYMAPPING 				*unite-gitlog-keymapping*
@@ -128,6 +129,9 @@ q					*unite-gitlog-q*
 
 ==============================================================================
 CHANGELOG				 *unite-gitlog-changelog*
+
+0.2.1 - 2016-01-09
+	add prompt for git reset operation
 
 0.2.0 - 2016-01-08
 	works with |easygit|
