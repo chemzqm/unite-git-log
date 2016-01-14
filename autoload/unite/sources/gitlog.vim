@@ -105,7 +105,7 @@ function! s:source.hooks.on_close(args, context) abort
 endfunction
 
 function! s:source.gather_candidates(args, context) abort
-  if get(a:context, 'source__directory', 0) == 0
+  if !exists('a:context.source__git_dir')
     let a:context.is_async = 0
     return []
   endif
