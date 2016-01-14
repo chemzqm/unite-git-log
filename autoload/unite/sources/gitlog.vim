@@ -52,6 +52,7 @@ function! s:source.hooks.on_init(args, context) abort
   endif
 
   let gitdir = easygit#gitdir(expand('%'), 1)
+  if empty(gitdir) | return | endif
   let a:context.source__directory = gitdir
 
   let extra = empty(get(a:args, 1, '')) ? '' :
@@ -104,6 +105,11 @@ function! s:source.hooks.on_close(args, context) abort
 endfunction
 
 function! s:source.gather_candidates(args, context) abort
+  if get(a:context, 'source__directory', 0) == 0
+    let a:context.is_async = 0
+    return []
+  endif
+
   let command = 'git --git-dir=' . a:context.source__git_dir
         \. ' --no-pager log'
 
