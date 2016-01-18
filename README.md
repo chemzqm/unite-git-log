@@ -14,7 +14,7 @@ http://7jpox4.com1.z0.glb.clouddn.com/gitlog.gif
 ## 更新
 
 2016-01-08
-* 新版去除了 `fugitive` 依赖，使用更为友好的 [easygit](https://github.com/chemzqm/easygit)
+* 新版去除了 `fugitive` 依赖，使用更为友好的 [easygit](https://github.com/chemzqm/vim-easygit)
 * 添加了 vim 文档
 
 2016-01-06
