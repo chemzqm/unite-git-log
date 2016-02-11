@@ -9,6 +9,7 @@ endfunction
 let s:source = {
       \ 'name': 'gitlog',
       \ 'max_candidates': 500,
+      \ 'description': 'candidates form gitlog',
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__Gitlog',
       \  "default_action" : "open",
