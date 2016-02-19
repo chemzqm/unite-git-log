@@ -12,13 +12,13 @@ let s:source = {
       \ 'description': 'candidates form gitlog',
       \ 'hooks' : {},
       \ 'syntax' : 'uniteSource__Gitlog',
-      \  "default_action" : "open",
-      \  'action_table' : {
+      \ "default_action" : "open",
+      \ 'action_table' : {
       \    'open' : {
       \      'description' : 'open commit detail',
       \      'is_selectable' : 0,
       \    },
-      \   'delete': {
+      \    'delete': {
       \      'description': 'git diff of current file',
       \      'is_selectable': 0,
       \      'is_quit': 0,
@@ -34,7 +34,7 @@ let s:source = {
       \      'is_selectable': 0,
       \    },
       \  }
-      \ }
+      \}
 
 let s:is_windows = has('win16') || has('win32') || has('win64') || has('win95')
 
