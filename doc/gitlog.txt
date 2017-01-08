@@ -11,10 +11,10 @@
 
 
 Author  : Qiming Zhao <chemzqm@gmail.com>
-Version : 0.2.0
+Version : 0.3.0
 License : MIT license {{{
 
-  Copyright (c) 2016 chemzqm@gmail.com
+  Copyright (c) 2017 chemzqm@gmail.com
 
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the
@@ -85,9 +85,9 @@ INTERFACE				*unite-gitlog-interface*
 ------------------------------------------------------------------------------
 COMMANDS 				*unite-gitlog-commands*
 
-:Unite gitlog[:[{all}]:[{days}]]
+:Unite gitlog[[:{all}][:{days}]]
 
-		By default, |unite-gitlog| would show all commit history for
+		By default, |unite-gitlog| would show commit history for
 		current buffer, if you want all commits, use {all} argument,
 		if you want limit the log in number of days, use {days}
 		argument, eg: >
@@ -101,10 +101,12 @@ COMMANDS 				*unite-gitlog-commands*
 ACTIONS 				*unite-gitlog-actions*
 
 open					*unite-gitlog-open*
+
 	default action, which open a buffer contains the commmit from git
 	show.
 
 delete					*unite-gitlog-delete*
+
 	Diff action, just named to delete so you can press <d> to start the
 	diff with current file.
 
@@ -112,8 +114,10 @@ preview					*unite-gitlog-preview*
 	Show commit info in preview window.
 
 reset					*unite-gitlog-reset*
-	Run git reset [--hard] (default reset is Mixed mode) with current
-	candidate.  Use it with caution.
+
+	Run `git reset` with current candidate. Prompt for hard reset.
+	Hard reset would discard commits and local changes, use it with
+	caution.
 
 ------------------------------------------------------------------------------
 KEYMAPPING 				*unite-gitlog-keymapping*
@@ -130,13 +134,20 @@ q					*unite-gitlog-q*
 ==============================================================================
 CHANGELOG				 *unite-gitlog-changelog*
 
+0.3.0 - 2017-01-08
+
+	Simplify the code by use |easygit#show| method
+
 0.2.1 - 2016-01-09
+
 	add prompt for git reset operation
 
 0.2.0 - 2016-01-08
+
 	works with |easygit|
 
 0.1.0 - 2015-12-20
+
 	works with |fugitive|
 
 ==============================================================================
