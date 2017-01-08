@@ -255,7 +255,7 @@ function! s:source.action_table.open.func(candidate) abort
   execute 'nnoremap <silent> <buffer> d :<c-u>call'
         \.' <SID>diffWith("'.ref.'", "'.bufname. '")<cr>'
   execute 'nnoremap <silent> <buffer> q :<c-u>call '
-        \.'<SID>smartQuite("'.bufname. '")<cr>'
+        \.'<SID>smartQuiet("'.bufname. '")<cr>'
   setlocal filetype=git buftype=nofile readonly foldmethod=syntax
   setlocal foldtext=easygit#foldtext()
 endfunction
@@ -301,7 +301,7 @@ function! s:diffWith(ref, bufname) abort
   call easygit#diffThis(a:ref)
 endfunction
 
-function! s:smartQuite(bufname)
+function! s:smartQuiet(bufname)
   let nr = bufnr(a:bufname)
   exe 'keepalt b ' . nr
 endfunction
