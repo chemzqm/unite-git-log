@@ -80,7 +80,7 @@ function! s:source.hooks.on_syntax(args, context) abort
   syntax case ignore
   syntax match uniteSource__GitlogHeader /^.*$/
         \ containedin=uniteSource__Gitlog
-  syntax match uniteSource__GitlogRef /\v((\*\||)\s)@<=[0-9A-Za-z]{7}(\s-\s)@=/ contained
+  syntax match uniteSource__GitlogRef /\v((\*\||)\s)@<=[0-9A-Za-z]{7,13}(\s-\s)@=/ contained
         \ containedin=uniteSource__GitlogHeader
         \ nextgroup=uniteSource__GitlogTag,uniteSource__GitlogTime
   syntax match uniteSource__GitlogTag /(.\{-}tag:\s.\{-})/ contained
@@ -197,7 +197,7 @@ function! s:source.async_gather_candidates(args, context) abort
 endfunction
 
 function! s:getLineInfo(line) abort
-  let ref = matchstr(a:line, '\v((\*\||)\s)@<=[0-9A-Za-z]{7}(\s-\s)@=')
+  let ref = matchstr(a:line, '\v((\*\||)\s)@<=[0-9A-Za-z]{7,13}(\s-\s)@=')
   let user = matchstr(a:line, '\v\<[^<]+\>$')
   return [ref, user]
 endfunction
