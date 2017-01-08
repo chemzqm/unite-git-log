@@ -186,7 +186,6 @@ function! s:source.async_gather_candidates(args, context) abort
           \ 'word' : line,
           \ 'is_dummy' : is_dummy,
           \ 'source__git_dir' : a:context.source__git_dir,
-          \ 'source__tmp_file': '',
           \ 'source__bufname' : a:context.source__bufname,
           \ 'source__info' : info,
           \ "kind": ["file", "command"],
@@ -211,53 +210,27 @@ endfunction
 
 function! s:source.action_table.preview.func(candidate) abort
   let ref = a:candidate.source__info[0]
-  let temp = fnamemodify(tempname(), ":h") . "/" . ref
-  let g:temp = temp
-  let g:dir = a:candidate.source__git_dir
-  let cmd = ':silent !git --git-dir=' . a:candidate.source__git_dir
-        \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2>&1'
-  execute cmd
-  call unite#view#_preview_file(temp)
-  call unite#add_previewed_buffer_list(temp)
-  let winnr = winnr()
-  execute 'wincmd P'
-  let bufname = a:candidate.source__bufname
-  let gitdir = a:candidate.source__git_dir
-  execute 'nnoremap <silent> <buffer> d :<c-u>call <SID>diffWith("'.ref.'", "'.bufname. '")<cr>'
-  setlocal filetype=git buftype=nofile readonly foldmethod=syntax
-  setlocal foldtext=easygit#foldtext()
-  execute winnr . 'wincmd w'
+  call easygit#show(ref, {
+        \ 'all': 1,
+        \ 'gitdir': a:candidate.source__git_dir,
+        \ 'edit': 'vsplit',
+        \})
 endfunction
 
 " Rewrite show d to show diff, q to quite
 function! s:source.action_table.open.func(candidate) abort
   let ref = a:candidate.source__info[0]
-  let temp = a:candidate.source__tmp_file
   let bufname = a:candidate.source__bufname
-  let gitdir = a:candidate.source__git_dir
   let wnr = bufwinnr(bufname)
-  if empty(temp)
-    let temp = fnamemodify(tempname(), ":h") . "/" . ref
-    let cmd = ':silent ! git --git-dir=' . a:candidate.source__git_dir
-          \. ' --no-pager show --no-color ' . ref . ' > ' . temp . ' 2>&1'
-    let a:candidate.source__tmp_file = temp
-    execute cmd
-  endif
+
   if wnr > 0
     exe wnr . 'wincmd w'
-    execute 'edit ' . temp
-  else
-    let view = winsaveview()
-    execute 'keepalt edit ' . temp
-    call winrestview(view)
   endif
 
-  execute 'nnoremap <silent> <buffer> d :<c-u>call'
-        \.' <SID>diffWith("'.ref.'", "'.bufname. '")<cr>'
-  execute 'nnoremap <silent> <buffer> q :<c-u>call '
-        \.'<SID>smartQuiet("'.bufname. '")<cr>'
-  setlocal filetype=git buftype=nofile readonly foldmethod=syntax
-  setlocal foldtext=easygit#foldtext()
+  call easygit#show(ref, {
+        \ 'all': 1,
+        \ 'gitdir': a:candidate.source__git_dir,
+        \})
 endfunction
 
 function! s:source.action_table.reset.func(candidate) abort
@@ -299,9 +272,4 @@ function! s:diffWith(ref, bufname) abort
     exe 'keepalt b ' . nr
   endif
   call easygit#diffThis(a:ref)
-endfunction
-
-function! s:smartQuiet(bufname)
-  let nr = bufnr(a:bufname)
-  exe 'keepalt b ' . nr
 endfunction
