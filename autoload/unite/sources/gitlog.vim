@@ -52,8 +52,12 @@ function! s:source.hooks.on_init(args, context) abort
     return
   endif
 
-  let gitdir = easygit#gitdir(expand('%'), 1)
-  if empty(gitdir) | return | endif
+  if &buftype == 'nofile'
+    let gitdir = s:FindGitdir()
+  else
+    let gitdir = easygit#gitdir(expand('%'), 1)
+  endif
+
   let a:context.source__directory = gitdir
 
   let extra = empty(get(a:args, 1, '')) ? '' :
@@ -272,4 +276,10 @@ function! s:diffWith(ref, bufname) abort
     exe 'keepalt b ' . nr
   endif
   call easygit#diffThis(a:ref)
+endfunction
+
+function! s:FindGitdir()
+  let dir = finddir('.git', expand(getcwd() . ';'))
+  if empty(dir) | return '' | endif
+  return fnamemodify(dir, ':p:h')
 endfunction
