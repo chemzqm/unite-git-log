@@ -249,10 +249,13 @@ function! s:source.action_table.reset.func(candidate) abort
   if empty(root) | return | endif
   let cwd = getcwd()
   exe 'lcd ' . root
-  if input('hard reset [y/n]?') =~? 'y'
-    let opt = '--hard '
-  else
-    let opt = ''
+  let m = input('select reset mode mixed|soft|hard [m/s/h/c]')
+  if empty(m) || m =~? 'c'
+    return
+  elseif m =~? 'm'
+    let opt = '--mixed '
+  elseif m =~? 's'
+    let opt = '--soft '
   endif
   let output = system('git reset ' . opt . ref)
   if v:shell_error && output !=# ""

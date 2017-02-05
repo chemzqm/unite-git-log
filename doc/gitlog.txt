@@ -11,7 +11,7 @@
 
 
 Author  : Qiming Zhao <chemzqm@gmail.com>
-Version : 0.3.0
+Version : 0.3.1
 License : MIT license {{{
 
   Copyright (c) 2017 chemzqm@gmail.com
@@ -115,7 +115,7 @@ preview					*unite-gitlog-preview*
 
 reset					*unite-gitlog-reset*
 
-	Run `git reset` with current candidate. Prompt for hard reset.
+	Run `git reset` with current candidate. Prompt for reset mode.
 	Hard reset would discard commits and local changes, use it with
 	caution.
 
@@ -123,20 +123,44 @@ reset					*unite-gitlog-reset*
 KEYMAPPING 				*unite-gitlog-keymapping*
 
 d					*unite-gitlog-d*
-	Start diff with current working buffer, availalbe in preview buffer
-	and default commit show buffer
+	Run diff action with current candidate and working buffer, available at
+	list view only.
+
+p					*unite-gitlog-p*
+
+	Run preview action of current candidate.
+
+r					*unite-gitlog-r*
+	Run reset action of current candidate.
+
+d					*unite-gitlog-d*
+	Run diff action with current candidate and working buffer, available at
+	list view only.
+	Run diff action with current candidate and working buffer, available at
+	list view only.
 
 q					*unite-gitlog-q*
 	In default commit show buffer, press <q> to quickly switch back to
 	your working buffer
 
+u					*unite-gitlog-u*
+
+	Would be used in preview window to show parent commit
+
+d					*unite-gitlog-d*
+
+	Would be used in preview window to show first child commit
 
 ==============================================================================
 CHANGELOG				 *unite-gitlog-changelog*
 
+0.3.1 - 2017-02-05
+
+	improve reset action
+
 0.3.0 - 2017-01-08
 
-	Simplify the code by use |easygit#show| method
+	simplify the code by use |easygit#show| method
 
 0.2.1 - 2016-01-09
 
