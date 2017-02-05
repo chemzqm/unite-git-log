@@ -133,23 +133,9 @@ p					*unite-gitlog-p*
 r					*unite-gitlog-r*
 	Run reset action of current candidate.
 
-d					*unite-gitlog-d*
-	Run diff action with current candidate and working buffer, available at
-	list view only.
-	Run diff action with current candidate and working buffer, available at
-	list view only.
-
 q					*unite-gitlog-q*
 	In default commit show buffer, press <q> to quickly switch back to
 	your working buffer
-
-u					*unite-gitlog-u*
-
-	Would be used in preview window to show parent commit
-
-d					*unite-gitlog-d*
-
-	Would be used in preview window to show first child commit
 
 ==============================================================================
 CHANGELOG				 *unite-gitlog-changelog*
