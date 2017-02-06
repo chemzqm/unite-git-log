@@ -6,6 +6,8 @@ function! unite#sources#gitlog#define()
   return s:source
 endfunction
 
+let s:preview_bufnr = 0
+
 let s:source = {
       \ 'name': 'gitlog',
       \ 'max_candidates': 500,
@@ -68,7 +70,7 @@ function! s:source.hooks.on_init(args, context) abort
     let file = fnamemodify(expand('%:p'),
     \  ':s?'. fnamemodify(gitdir, ':h') . '/??')
     if s:is_windows | let file = substitute(file, '^\\', '', '') | endif
-    let extra = extra . ' -- ' . file
+    let extra = extra . ' -- ' . shellescape(file)
   endif
 
   let a:context.source__bufname = bufname('%')
@@ -214,11 +216,16 @@ endfunction
 
 function! s:source.action_table.preview.func(candidate) abort
   let ref = a:candidate.source__info[0]
+  if s:preview_bufnr && bufexists(s:preview_bufnr)
+    execute 'bunload! '.s:preview_bufnr
+  endif
   call easygit#show(ref, {
         \ 'all': 1,
         \ 'gitdir': a:candidate.source__git_dir,
         \ 'edit': 'vsplit',
         \})
+  let s:preview_bufnr = bufnr('%')
+  wincmd p
 endfunction
 
 " Rewrite show d to show diff, q to quite
