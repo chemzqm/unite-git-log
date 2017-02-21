@@ -86,6 +86,7 @@ function! s:source.hooks.on_syntax(args, context) abort
   syntax case ignore
   syntax match uniteSource__GitlogHeader /^.*$/
         \ containedin=uniteSource__Gitlog
+
   syntax match uniteSource__GitlogRef /\v((\*\||)\s)@<=[0-9A-Za-z]{7,13}(\s-\s)@=/ contained
         \ containedin=uniteSource__GitlogHeader
         \ nextgroup=uniteSource__GitlogTag,uniteSource__GitlogTime
@@ -256,7 +257,7 @@ function! s:source.action_table.reset.func(candidate) abort
   if empty(root) | return | endif
   let cwd = getcwd()
   exe 'lcd ' . root
-  let m = input('select reset mode mixed|soft|hard [m/s/h/c]')
+  let m = input('select reset mode mixed|soft|hard [m/s/h]')
   if empty(m) || m =~? 'c'
     return
   elseif m =~? 'm'
@@ -273,7 +274,6 @@ function! s:source.action_table.reset.func(candidate) abort
   exe 'silent edit'
   exe 'lcd ' . cwd
   execute 'wincmd p'
-  let unite = unite#get_current_unite()
   call unite#force_redraw()
 endfunction
 
