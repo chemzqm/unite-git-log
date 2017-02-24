@@ -1,5 +1,8 @@
 # Unite-git-log
 
+该项目已停止更新，请考虑使用 [denite.nvim](https://github.com/Shougo/denite.nvim), 以及
+[denite-git](https://github.com/chemzqm/denite-git)
+
 使用 unite 界面与 gitlog 进行交互
 
 [Unite.vim](https://github.com/Shougo/unite.vim)
